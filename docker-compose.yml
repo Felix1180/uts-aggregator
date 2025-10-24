@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  aggregator:
+    build: .
+    container_name: uts_aggregator
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+  publisher:
+    image: python:3.11-slim
+    container_name: uts_publisher
+    depends_on:
+      - aggregator
+    volumes:
+      - ./src:/app/src
+    working_dir: /app
+    command:
+      [
+        "bash",
+        "-c",
+        "python src/publisher_sim.py --count 200 --url http://aggregator:8080 --topic app.logs --source sim",
+      ]
